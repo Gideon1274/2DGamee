@@ -2,6 +2,7 @@ package entity;
 
 import main.GamePanel;
 import main.KeyHandler;
+import main.UtilityTool;
 
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -14,7 +15,7 @@ public class Player extends Entity{
 
     public final int screenX;
     public final int screenY;
-    int hasKey = 0;
+    public int hasKey = 0;
 
     public Player(GamePanel gp, KeyHandler keyH){
         this.gp=gp;
@@ -42,20 +43,29 @@ public class Player extends Entity{
     }
 
     public void getPlayerImage() {
-        try {
-            up1 = ImageIO.read(getClass().getResourceAsStream("/pics/player/boy_up_1.png"));
-            up2 = ImageIO.read(getClass().getResourceAsStream("/pics/player/boy_up_2.png"));
-            down1 = ImageIO.read(getClass().getResourceAsStream("/pics/player/boy_down_1.png"));
-            down2 = ImageIO.read(getClass().getResourceAsStream("/pics/player/boy_down_2.png"));
-            left1 = ImageIO.read(getClass().getResourceAsStream("/pics/player/boy_left_1.png"));
-            left2 = ImageIO.read(getClass().getResourceAsStream("/pics/player/boy_left_2.png"));
-            right1 = ImageIO.read(getClass().getResourceAsStream("/pics/player/boy_right_1.png"));
-            right2 = ImageIO.read(getClass().getResourceAsStream("/pics/player/boy_right_2.png"));
-        } catch (IOException e) {
+        
+        up1 = setup("boy_up_1");
+        up2 = setup("boy_up_2");
+        down1 = setup("boy_down_1");
+        down2 = setup("boy_down_2");
+        left1 = setup("boy_left_1");
+        left2 = setup("boy_left_2");
+        right1 = setup("boy_right_1");
+        right2 = setup("boy_right_2");
+    }
+
+    public BufferedImage setup(String imageName){
+        UtilityTool uTool = new UtilityTool();
+        BufferedImage image = null;
+
+        try{
+            image = ImageIO.read(getClass().getResourceAsStream("/pics/player/"+imageName+".png"));
+            image = uTool.scaleImage(image, gp.tileSize, gp.tileSize);
+        }catch(IOException e){
             e.printStackTrace();
         }
+        return image;
     }
-    
     public void update(){
         if(keyH.upPressed==true||keyH.downPressed==true||keyH.leftPressed==true||keyH.rightPressed==true){
               if(keyH.upPressed==true){
@@ -111,18 +121,21 @@ public class Player extends Entity{
                     gp.playSE(1);
                     hasKey++;
                     gp.obj[i] = null;
-                    System.out.println("Key: "+hasKey);
-                    System.out.println("Speed: "+speed);
+                    gp.ui.showMessage("You got a key!");
+                    // System.out.println("Key: "+hasKey);
+                    // System.out.println("Speed: "+speed);
                     break;
                 case("Door"):
-                    gp.playSE(3);
+                    
                     if(hasKey>0){
                         gp.obj[i] = null;
                         hasKey--;
-
+                        gp.playSE(3);
+                        gp.ui.showMessage("You opened the door!");
                     }
                     else{
                         collisionOn = true;
+                        gp.ui.showMessage("You dont have a key!");
                     }
                     // System.out.println("Key: "+hasKey);
                     break;
@@ -130,7 +143,13 @@ public class Player extends Entity{
                     gp.playSE(2);
                     speed+=2;
                     gp.obj[i] = null;
-                    System.out.println("Speed: "+speed);
+                    gp.ui.showMessage("Speed up!");
+                    // System.out.println("Speed: "+speed);
+                    break;
+                case "Chest":
+                    gp.ui.gameFinished =true;
+                    gp.stopMusic();
+                    gp.playSE(4);
                     break;
                 
             }
@@ -178,7 +197,7 @@ public class Player extends Entity{
                 }
                 break;
         }
-        g2.drawImage(image,screenX,screenY,gp.tileSize, gp.tileSize, null);
+        g2.drawImage(image,screenX,screenY, null);
 
     }
 }

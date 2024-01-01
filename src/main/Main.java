@@ -18,8 +18,6 @@ public class Main {
         gamePanel.setupGame();
         gamePanel.startGameThread();
         
-        // qwejqowiejqwjeioqwjeioq
-
 
 
     }
