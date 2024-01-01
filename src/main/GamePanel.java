@@ -22,7 +22,7 @@ public class GamePanel extends JPanel implements Runnable{
 
     //WORLD SETTINGS
     public final int maxWorldCol = 50;
-    public final int maxWorldRow = 100;
+    public final int maxWorldRow = 50;
     public final int worldWidth = tileSize * maxWorldCol;
     public final int worldHeight = tileSize * maxWorldRow;
 
@@ -32,11 +32,13 @@ public class GamePanel extends JPanel implements Runnable{
     TileManager tileM = new TileManager(this);
     KeyHandler keyH = new KeyHandler();
 
-    Sound sound = new Sound();
+    Sound music = new Sound();
+    Sound se = new Sound();
 
     
     public CollisionChecker cChecker = new CollisionChecker(this);
     public AssetSetter aSetter = new AssetSetter(this);
+    public UI ui = new UI(this);
     Thread gameThread;
 
     // entity and object
@@ -132,6 +134,12 @@ public class GamePanel extends JPanel implements Runnable{
 
         Graphics2D g2 = (Graphics2D)g;
         
+        //debug
+        long drawStart = 0;
+        if(keyH.checkDrawTime == true){
+        drawStart = System.nanoTime();
+        }
+
         //tile
         tileM.draw(g2);
 
@@ -144,21 +152,33 @@ public class GamePanel extends JPanel implements Runnable{
 
         //player
         player.draw(g2);
+        
+        //ui
+        ui.draw(g2);
 
+
+            //debug
+            if(keyH.checkDrawTime==true){
+        long drawEnd = System.nanoTime();
+        long passed = drawEnd - drawStart;
+        g2.setColor(Color.white);
+        g2.drawString("Draw Time: "+passed, 10,400);
+        System.out.println("Draw Time: "+passed);
+            }
         g2.dispose();
-
+        
     }
     public void playMusic(int i){
-        sound.setFile(i);
-        sound.play();
-        sound.loop();
+        music.setFile(i);
+        music.play();
+        music.loop();
 
     }
     public void stopMusic(){
-        sound.stop();
+        music.stop();
     }
     public void playSE(int i){
-        sound.setFile(i);
-        sound.play();
+        se.setFile(i);
+        se.play();
     }
 }
